@@ -1,7 +1,7 @@
 require("dotenv").config();
 const { WakaTimeClient, RANGE } = require("wakatime-client");
 const Octokit = require("@octokit/rest");
-// 111
+
 const {
   GIST_ID: gistId,
   GH_TOKEN: githubToken,
@@ -14,7 +14,6 @@ const octokit = new Octokit({ auth: `token ${githubToken}` });
 
 async function main() {
   const stats = await wakatime.getMyStats({ range: RANGE.LAST_7_DAYS });
-  console.log('ss', stats)
   await updateGist(stats);
 }
 
@@ -34,7 +33,7 @@ async function updateGist(stats) {
     const line = [
       name.padEnd(11),
       time.padStart(14) + " ",
-      unicodeProgressBar(percent + 15),
+      unicodeProgressBar(percent, 7, 18, 18),
       String(percent.toFixed(1)).padStart(5) + "%"
     ];
 
@@ -87,7 +86,6 @@ function unicodeProgressBar(p, style = 7, min_size = 20, max_size = 20) {
   let x;
   let min_delta = Number.POSITIVE_INFINITY;
   const bar_style = bar_styles[style];
-  console.log('bar_style', bar_style)
   const full_symbol = bar_style[bar_style.length - 1];
   const n = bar_style.length - 1;
   if (p === 100) return full_symbol.repeat(max_size);
@@ -104,8 +102,10 @@ function unicodeProgressBar(p, style = 7, min_size = 20, max_size = 20) {
       min_delta = d;
       m = bar_style[middle];
       if (full === i) m = "";
-      console.log('bar_', bar_style)
-      r = full_symbol.repeat(full) + m + bar_style[0].repeat(i - full - 1);
+      r =
+        full_symbol.repeat(full) +
+        m +
+        bar_style[0].repeat(Math.max(0, i - full - 1));
     }
   }
   return r;
